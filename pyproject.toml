@@ -4,7 +4,6 @@ build-backend = "hatchling.build"
 
 [project]
 name = "resume-builder-frontend"
-dynamic = ["version"]
 description = ''
 readme = "README.md"
 requires-python = ">=3.8"
@@ -30,6 +29,7 @@ dependencies = [
     "validator-collection",
     "streamlit-tags",
 ]
+version = "0.0.1"
 
 [project.urls]
 Documentation = "https://github.com/unknown/resume-builder-frontend#readme"
