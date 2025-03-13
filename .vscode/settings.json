@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/resume_builder_frontend"
+    ]
+}
