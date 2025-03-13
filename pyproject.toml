@@ -28,6 +28,7 @@ dependencies = [
     "streamlit",
     "validator-collection",
     "streamlit-tags",
+    "streamlit-google-auth"
 ]
 version = "0.0.1"
 

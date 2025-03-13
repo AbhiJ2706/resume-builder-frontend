@@ -17,7 +17,7 @@ jobs:
 
       # Set up AWS credentials
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS__ACCOUNT_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_ACCOUNT_SECRET_KEY }}
@@ -31,7 +31,7 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t resume-builder-frontend .
+          docker build -t resume-builder-frontend . --platform linux/amd64
 
       # Tag the Docker image
       - name: Tag Docker image
