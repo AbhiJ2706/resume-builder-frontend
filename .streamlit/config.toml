@@ -2,3 +2,6 @@
 base="dark"
 primaryColor="#007BA7"
 tertiaryColor="#FF0000"
+
+[runner]
+enforceSerializableSessionState = true

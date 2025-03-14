@@ -28,7 +28,9 @@ dependencies = [
     "streamlit",
     "validator-collection",
     "streamlit-tags",
-    "streamlit-google-auth"
+    "streamlit-google-auth",
+    "boto3",
+    "python-dotenv"
 ]
 version = "0.0.1"
 
