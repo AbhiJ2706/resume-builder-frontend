@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "resume-builder-frontend"
 description = ''
 readme = "README.md"
-requires-python = ">=3.8,<4"
+requires-python = ">=3.8"
 license = "MIT"
 keywords = []
 authors = [
@@ -27,8 +27,7 @@ dependencies = [
     "reportlab",
     "streamlit",
     "validator-collection",
-    "streamlit-tags",
-    "streamlit-google-auth"
+    "streamlit-tags"
 ]
 version = "0.0.1"
 
