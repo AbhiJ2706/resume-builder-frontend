@@ -22,13 +22,14 @@ load_dotenv()
 if os.environ.get("ENVIRONMENT"):
     ENVIRONMENT = "local"
     AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-    AWS_SECRET_KEY_ID = os.environ["AWS_SECRET_KEY_ID"]
-    REDIRECT_URI = os.environ["REDIRECT_URI"]
+    AWS_SECRET_KEY_ID = os.environ["AWS_SECRET_ACCESS_KEY"]
+    REDIRECT_URI = "http://localhost:8501"
     GOOGLE_CLOUD_CREDENTIALS = json.loads(os.environ["GOOGLE_CLOUD_CREDENTIALS"])
     with open("credentials.json", "w+") as f:
         f.write(json.dumps(GOOGLE_CLOUD_CREDENTIALS))
 else:
     ENVIRONMENT = "production"
+    REDIRECT_URI = os.environ["REDIRECT_URI"]
 
 AWS_S3_BUCKET = "user-resume-info-resume-builder-tailor"
 
@@ -169,7 +170,7 @@ class AWSClient:
     def put_intermediate_resume(self, user_id):
         resume_data = copy.deepcopy({
             k: st.session_state[k] for k in 
-            list(filter(lambda x: x not in ["authenticator"], st.session_state.keys()))
+            list(filter(lambda x: x not in ["authenticator", "user_info"], st.session_state.keys()))
         })
 
         self.client.put_object(
@@ -195,10 +196,11 @@ class AWSClient:
             )
         else:
             print("not valid")
+        
+        return is_valid
 
 
 def main():
-    st.title("Let's build a resume.")
 
     if 'connected' not in st.session_state:
         authenticator = Authenticate(
@@ -212,8 +214,46 @@ def main():
     st.session_state["authenticator"].check_authentification()
 
     if not st.session_state.get('connected', False):
+        st.title("One resume, infinite possibilities.")
+        st.subheader("Automatically optimize your resume for any job posting in 3 simple steps:")
+        st.markdown(
+            """
+            1. Enter your resume details
+            2. Download the [chrome extension]()
+            3. Before you apply for a job, highlight the job posting and use the extension to receive your optimized resume
+            """
+        )
+        st.subheader("Ready to let your skills shine?")
         authorization_url = st.session_state["authenticator"].get_authorization_url()
-        st.link_button('Login', authorization_url)
+        st.link_button('Login 🚀', authorization_url, type="primary")
+        with st.expander(f"Learn more", expanded=False):
+            st.markdown(
+                """
+                **What is Tailor?**
+
+                Do you spend hours customizing your resume for every job you apply to, only to be automatically rejected?
+
+                Tailor is a tool which helps you maximize the relevance of your resume with respect to any job posting you apply to.
+                
+                When you apply for a job posting, Tailor reads the description. 
+                
+                It selects the most relevant information from your experience, and generates a parser-friendly copy of your resume specifically for tha position.
+
+                No more formatting errors, typos, or headaches. Tailor helps you look your best for every company!
+
+                **How does it work?**
+
+                Tailor uses a Large Language Model (LLM) to extract the relevant information from your resume. It then creates a formatted resume based on our library of premade templates.
+
+                **Where does my data go?**
+
+                Your resume data does not leave our servers. All processing, including the LLM-based processing, is performed directly on our servers.
+
+                **Contact Information**
+
+                You can contact us via [email](mailto:resume-builder-tailor@gmail.com)
+                """
+            )
         st.session_state.page = 0
     else:
         st.session_state.page = 1 if not st.session_state.get("page") or st.session_state.page == 0 else st.session_state.page
@@ -239,6 +279,8 @@ def main():
         st.session_state.sections = dict()
 
     if st.session_state.page == 1:
+        st.title("Let's build a resume.")
+
         st.header("Personal Information", divider="grey")
 
         st.session_state.user_resume_information["firstname"] = st.text_input(
@@ -364,17 +406,20 @@ def main():
                     "domain_label": "Domains" if is_swe else "Areas of Focus",
                     "is_swe": is_swe
                 })
+                s3_client = AWSClient()
+                s3_client.put_intermediate_resume(st.session_state.user_info['id'])
                 st.session_state.page = 2
                 st.rerun()
 
     elif st.session_state.page == 2:
+        st.title("Let's build a resume.")
         core_skills_label = st.session_state.user_resume_information["core_skill_label"]
         extra_skills_label = st.session_state.user_resume_information["extra_skill_label"]
 
         section_titles = {"Experience": "experience", "Extracurriculars": "extracurriculars", "Projects": "projects"}
         
         st.header("Add Sections")
-        st.text(f"These are the parts of your resume where you add the details of all the past work. Please add as much information as possible.")
+        st.markdown(f"These are the parts of your resume where you add the details of all the past work. **Please add as much information as possible.** The more information you can provide about your past experience, the better we can specialize your resume for different roles and descriptions.")
         section_type = st.selectbox("Select Section Type", list(section_titles.keys()))
 
         if "sections" not in st.session_state:
@@ -499,10 +544,32 @@ def main():
                 s3_client.put_intermediate_resume(st.session_state.user_info['id'])
         
         with col3:
-            if st.button("Submit 🚀", type="primary"):
+            if st.button("Save & Continue", type="primary"):
                 s3_client = AWSClient()
-                s3_client.put_final_resume(st.session_state.user_info['id'])
+                is_valid = s3_client.put_final_resume(st.session_state.user_info['id'])
+                if is_valid:
+                    st.session_state.page = 3
+                    st.rerun()
 
+    elif st.session_state.page == 3:
+        st.title("Let's build a resume.")
+
+        st.header("Final touches", divider="grey")
+
+        st.subheader("Choose an accent color for your resume")
+
+        color = st.color_picker("", "#007BA7")
+
+        st.session_state.update({"color": color})
+
+        st.subheader("Choose a default template for your resume. This will be used in application portals where we don't have an optimized template.")
+
+        # select theme
 
 if __name__ == "__main__":
+
+    # if "X-Forwarded-Proto" in st.query_params:
+    #     st.query_params(
+    #         **{"X-Forwarded-Proto": "http"}
+    #     )
     main()
