@@ -718,19 +718,6 @@ const ExperienceSection = ({ resumeData, setResumeData, onNavigate, onSave }) =>
                     </LocalizationProvider>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={item.still_working}
-                          onChange={(e) => {
-                            const newItems = [...resumeData[key]];
-                            newItems[itemIndex].still_working = e.target.checked;
-                            setResumeData({...resumeData, [key]: newItems});
-                          }}
-                        />
-                      }
-                      label="I am currently working here"
-                    />
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker
                         label="End Date"
@@ -744,6 +731,19 @@ const ExperienceSection = ({ resumeData, setResumeData, onNavigate, onSave }) =>
                         renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
                       />
                     </LocalizationProvider>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={item.still_working}
+                          onChange={(e) => {
+                            const newItems = [...resumeData[key]];
+                            newItems[itemIndex].still_working = e.target.checked;
+                            setResumeData({...resumeData, [key]: newItems});
+                          }}
+                        />
+                      }
+                      label="I am currently working here"
+                    />
                   </Grid>
                   <Grid item xs={12}>
                     <TagInput
