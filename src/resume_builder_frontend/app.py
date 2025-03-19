@@ -19,19 +19,19 @@ from strings import date_to_string, internal_to_external
 load_dotenv()
 
 
-if os.environ.get("ENVIRONMENT"):
-    ENVIRONMENT = "local"
-    AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-    AWS_SECRET_KEY_ID = os.environ["AWS_SECRET_ACCESS_KEY"]
-    REDIRECT_URI = "http://localhost:8501"
-    GOOGLE_CLOUD_CREDENTIALS = json.loads(os.environ["GOOGLE_CLOUD_CREDENTIALS"])
-    with open("credentials.json", "w+") as f:
-        f.write(json.dumps(GOOGLE_CLOUD_CREDENTIALS))
-else:
-    ENVIRONMENT = "production"
-    REDIRECT_URI = os.environ["REDIRECT_URI"]
+# if os.environ.get("ENVIRONMENT"):
+#     ENVIRONMENT = "local"
+#     AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
+#     AWS_SECRET_KEY_ID = os.environ["AWS_SECRET_ACCESS_KEY"]
+#     REDIRECT_URI = "http://localhost:8501"
+#     GOOGLE_CLOUD_CREDENTIALS = json.loads(os.environ["GOOGLE_CLOUD_CREDENTIALS"])
+#     with open("credentials.json", "w+") as f:
+#         f.write(json.dumps(GOOGLE_CLOUD_CREDENTIALS))
+# else:
+#     ENVIRONMENT = "production"
+#     REDIRECT_URI = os.environ["REDIRECT_URI"]
 
-AWS_S3_BUCKET = "user-resume-info-resume-builder-tailor"
+# AWS_S3_BUCKET = "user-resume-info-resume-builder-tailor"
 
 
 class ListInputController:
@@ -77,6 +77,8 @@ def postprocess_partial_form(partial_form):
     if isinstance(partial_form, dict):
         return {section: postprocess_partial_form(item) for (section, item) in partial_form.items()}
     elif isinstance(partial_form, list):
+        if len(partial_form) and isinstance(partial_form[0], dict) and "start_date" in partial_form[0]:
+            partial_form = sorted(partial_form, key=lambda x: x['start_date'], reverse=True)
         return [postprocess_partial_form(item) for item in partial_form]
     elif isinstance(partial_form, date):
         return date_to_string(partial_form)
@@ -87,6 +89,8 @@ def postprocess_partial_intermediate_form(partial_form):
     if isinstance(partial_form, dict):
         return {section: postprocess_partial_intermediate_form(item) for (section, item) in partial_form.items()}
     elif isinstance(partial_form, list):
+        if len(partial_form) and isinstance(partial_form[0], dict) and "start_date" in partial_form[0]:
+            partial_form = sorted(partial_form, key=lambda x: x['start_date'], reverse=True)
         return [postprocess_partial_intermediate_form(item) for item in partial_form]
     elif isinstance(partial_form, date):
         return str(partial_form)
@@ -146,24 +150,14 @@ def validate_and_post_process(resume_data: dict):
 
 class AWSClient:
     def __init__(self):
-        if ENVIRONMENT == "local":
-            self.client = boto3.client(
-                's3', 
-                aws_access_key_id=AWS_ACCESS_KEY_ID, 
-                aws_secret_access_key=AWS_SECRET_KEY_ID
-            )
-        else:
-            self.client = boto3.client('s3')
+        pass
     
     def get_resume(self, user_id):
         try:
-            response = self.client.get_object(
-                Bucket=AWS_S3_BUCKET, 
-                Key=f"{user_id}_intermediate.json"
-            )
-            text = preprocess_partial_intermediate_form(json.loads(response["Body"].read().decode()))
-            for k, v in text.items():
-                st.session_state[k] = v
+            with open("1_intermediate.json", "r+") as f:
+                text = preprocess_partial_intermediate_form(json.loads(f.read()))
+                for k, v in text.items():
+                    st.session_state[k] = v
         except ClientError as e:
             print(e)
     
@@ -173,11 +167,8 @@ class AWSClient:
             list(filter(lambda x: x not in ["authenticator", "user_info"], st.session_state.keys()))
         })
 
-        self.client.put_object(
-            Body=(bytes(json.dumps(postprocess_partial_intermediate_form(resume_data)).encode('UTF-8'))), 
-            Bucket=AWS_S3_BUCKET, 
-            Key=f"{user_id}_intermediate.json"
-        )
+        with open("1_intermediate.json", "w+") as f:
+            f.write(json.dumps(postprocess_partial_intermediate_form(resume_data), indent=4))
     
     def put_final_resume(self, user_id):
         resume_data = {
@@ -189,11 +180,8 @@ class AWSClient:
         resume_data, is_valid = validate_and_post_process(resume_data)
 
         if is_valid:
-            self.client.put_object(
-                Body=(bytes(json.dumps(resume_data).encode('UTF-8'))), 
-                Bucket=AWS_S3_BUCKET, 
-                Key=f"{user_id}_final.json"
-            )
+            with open("1_final.json", "w+") as f:
+                f.write(json.dumps(resume_data, indent=4))
         else:
             print("not valid")
         
@@ -201,19 +189,28 @@ class AWSClient:
 
 
 def main():
+    
+    if not st.session_state.get("page"):
+        st.session_state.page = 0
 
-    if 'connected' not in st.session_state:
-        authenticator = Authenticate(
-            secret_credentials_path = 'credentials.json',
-            cookie_name='my_cookie_name',
-            cookie_key='this_is_secret',
-            redirect_uri=REDIRECT_URI,
-        )
-        st.session_state["authenticator"] = authenticator
+    if "user_resume_information" not in st.session_state:
+        st.session_state.user_resume_information = {
+            "firstname": "",
+            "lastname": "",
+            "phone": "",
+            "email": "",
+            "linkedin": "",
+            "profile": "",
+            "domains": [],
+            "is_swe": False,
+            "color": "",
+            "default_template": ""
+        }
 
-    st.session_state["authenticator"].check_authentification()
+    if "sections" not in st.session_state:
+        st.session_state.sections = dict()
 
-    if not st.session_state.get('connected', False):
+    if st.session_state.page == 0:
         st.title("One resume, infinite possibilities.")
         st.subheader("Automatically optimize your resume for any job posting in 3 simple steps:")
         st.markdown(
@@ -224,8 +221,11 @@ def main():
             """
         )
         st.subheader("Ready to let your skills shine?")
-        authorization_url = st.session_state["authenticator"].get_authorization_url()
-        st.link_button('Login 🚀', authorization_url, type="primary")
+
+        def mock_redirect():
+            st.session_state.page = 1
+            
+        st.button('Login 🚀', type="primary", on_click=mock_redirect)
         with st.expander(f"Learn more", expanded=False):
             st.markdown(
                 """
@@ -254,31 +254,13 @@ def main():
                 You can contact us via [email](mailto:resume-builder-tailor@gmail.com)
                 """
             )
-        st.session_state.page = 0
-    else:
-        st.session_state.page = 1 if not st.session_state.get("page") or st.session_state.page == 0 else st.session_state.page
-
-        if "logged_in" not in st.session_state:
-            s3_client = AWSClient()
-            s3_client.get_resume(st.session_state.user_info['id'])
-        st.session_state.logged_in = True
-
-    if "user_resume_information" not in st.session_state:
-        st.session_state.user_resume_information = {
-            "firstname": "",
-            "lastname": "",
-            "phone": "",
-            "email": "",
-            "linkedin": "",
-            "profile": "",
-            "domains": [],
-            "is_swe": False
-        }
-
-    if "sections" not in st.session_state:
-        st.session_state.sections = dict()
 
     if st.session_state.page == 1:
+        if "logged_in" not in st.session_state:
+            s3_client = AWSClient()
+            s3_client.get_resume(000)
+        st.session_state.logged_in = True
+
         st.title("Let's build a resume.")
 
         st.header("Personal Information", divider="grey")
@@ -354,13 +336,15 @@ def main():
                         "Start", 
                         format="DD/MM/YYYY", 
                         key=f"start_{i}",
-                        value=st.session_state.education[i]["start"]
+                        value=st.session_state.education[i]["start"],
+                        min_value=datetime(1950, 1, 1).date()
                     )
                     st.session_state.education[i]["end"] = st.date_input(
                         "End (Actual or Expected)", 
                         format="DD/MM/YYYY", 
                         key=f"end_{i}",
-                        value=st.session_state.education[i]["end"]
+                        value=st.session_state.education[i]["end"],
+                        min_value=datetime(1950, 1, 1).date()
                     )
                     st.session_state.education[i]["relevant_coursework"] = st.text_input(
                         "Relevant coursework", 
@@ -375,18 +359,26 @@ def main():
              
         st.header("Additional Information")
 
-        is_swe = st.checkbox(
+        st.checkbox(
             "I am applying for software engineering (or adjacent) roles", 
             key="is_swe", 
-            value=st.session_state.user_resume_information["is_swe"]
+            value=st.session_state["is_swe"]
         )
+
+        color = st.color_picker("Choose an accent color for your resume", "#007BA7")
+
+        st.session_state.update({"color": color})
+
+        st.text("Choose a default template for your resume. This will be used in application portals where we don't have an optimized template.")
 
         st.session_state.user_resume_information.update({
             "education": st.session_state.education,
-            "core_skill_label": "Languages" if is_swe else "Skills",
-            "extra_skill_label": "Technologies" if is_swe else None,
-            "domain_label": "Domains" if is_swe else "Areas of Focus",
-            "is_swe": is_swe
+            "core_skill_label": "Languages" if st.session_state["is_swe"] else "Skills",
+            "extra_skill_label": "Technologies" if st.session_state["is_swe"] else None,
+            "domain_label": "Domains" if st.session_state["is_swe"] else "Areas of Focus",
+            "is_swe": st.session_state["is_swe"],
+            "color": st.session_state["color"],
+            "default_template": st.session_state["default_template"]
         })
 
         st.divider()
@@ -395,19 +387,21 @@ def main():
         with col1:
             if st.button("Save", use_container_width=True):
                 s3_client = AWSClient()
-                s3_client.put_intermediate_resume(st.session_state.user_info['id'])
+                s3_client.put_intermediate_resume(000)
 
         with col2:
             if st.button("Save & Continue", type="primary"):
                 st.session_state.user_resume_information.update({
                     "education": st.session_state.education,
-                    "core_skill_label": "Languages" if is_swe else "Skills",
-                    "extra_skill_label": "Technologies" if is_swe else None,
-                    "domain_label": "Domains" if is_swe else "Areas of Focus",
-                    "is_swe": is_swe
+                    "core_skill_label": "Languages" if st.session_state["is_swe"] else "Skills",
+                    "extra_skill_label": "Technologies" if st.session_state["is_swe"] else None,
+                    "domain_label": "Domains" if st.session_state["is_swe"] else "Areas of Focus",
+                    "is_swe": st.session_state["is_swe"],
+                    "color": st.session_state["color"],
+                    "default_template": st.session_state["default_template"]
                 })
                 s3_client = AWSClient()
-                s3_client.put_intermediate_resume(st.session_state.user_info['id'])
+                s3_client.put_intermediate_resume(000)
                 st.session_state.page = 2
                 st.rerun()
 
@@ -416,7 +410,7 @@ def main():
         core_skills_label = st.session_state.user_resume_information["core_skill_label"]
         extra_skills_label = st.session_state.user_resume_information["extra_skill_label"]
 
-        section_titles = {"Experience": "experience", "Extracurriculars": "extracurriculars", "Projects": "projects"}
+        section_titles = {"Experience": "experience", "Extracurriculars": "extracurriculars", "Projects": "projects", "Research": "research"}
         
         st.header("Add Sections")
         st.markdown(f"These are the parts of your resume where you add the details of all the past work. **Please add as much information as possible.** The more information you can provide about your past experience, the better we can specialize your resume for different roles and descriptions.")
@@ -449,14 +443,16 @@ def main():
                 "core_skills": [],
                 "extra_skills": [],
                 "description": [],
-                "still_working": False
+                "still_working": False,
+                "link": ""
             }) as section_controller:
                 
                 if st.button(f"Add {name.capitalize()} Item"):
                     section_controller.add_item()
                 
                 for i in range(len(st.session_state[name])):
-                    with st.expander(f"**{name.capitalize()} Item {i + 1}**", expanded=True):
+                    expander_name = st.session_state[name][i]["organization"].capitalize() if st.session_state[name][i]["organization"] else f"**{name.capitalize()} Item {i + 1}**"
+                    with st.expander(expander_name, expanded=True):
                         st.session_state[name][i]["organization"] = st.text_input(
                             internal_to_external("organization"), 
                             key=f"org_{name}_{i}",
@@ -475,7 +471,8 @@ def main():
                         st.session_state[name][i]["start"] = st.date_input(
                             internal_to_external("start"), 
                             key=f"start_{name}_{i}",
-                            value=st.session_state[name][i]["start"]
+                            value=st.session_state[name][i]["start"],
+                            min_value=datetime(1950, 1, 1).date()
                         )
                         st.session_state[name][i]["end"] = st.date_input(
                             internal_to_external("end"), 
@@ -485,7 +482,8 @@ def main():
                                 "I am currently working here", 
                                 key=f"working_{name}_{i}",
                                 value=st.session_state[name][i]["still_working"]
-                            )
+                            ),
+                            min_value=datetime(1950, 1, 1).date()
                         )
                         st.session_state[name][i]["core_skills"] = st_tags(
                             label=internal_to_external("core_skills", fmt=core_skills_label), 
@@ -499,6 +497,12 @@ def main():
                                 key=f"extra_{name}_{i}",
                                 value=st.session_state[name][i]["extra_skills"]
                             )
+                        
+                        st.session_state[name][i]["link"] = st.text_input(
+                            internal_to_external("link"), 
+                            key=f"link_{name}_{i}",
+                            value=st.session_state[name][i]["link"]
+                        )
 
                         st.text(f"{name.capitalize()} Item {i + 1} Description")
 
@@ -508,7 +512,7 @@ def main():
                             "group": 0
                         }) as description_controller:
                             st.session_state[f"{name}_{i}_description"] = st.session_state[name][i]["description"]
-                            if st.button(f"Add Point for {name.capitalize()} {i}"):
+                            if st.button(f"Add Point for {name.capitalize()} {i + 1}"):
                                 description_controller.add_item()
 
                             for j in range(len(st.session_state[f"{name}_{i}_description"])):
@@ -541,30 +545,35 @@ def main():
         with col2:
             if st.button("Save", use_container_width=True):
                 s3_client = AWSClient()
-                s3_client.put_intermediate_resume(st.session_state.user_info['id'])
+                s3_client.put_intermediate_resume(000)
         
         with col3:
-            if st.button("Save & Continue", type="primary"):
+            if st.button("Save & Submit 🚀", type="primary"):
                 s3_client = AWSClient()
-                is_valid = s3_client.put_final_resume(st.session_state.user_info['id'])
+                is_valid = s3_client.put_final_resume(000)
                 if is_valid:
                     st.session_state.page = 3
                     st.rerun()
 
     elif st.session_state.page == 3:
-        st.title("Let's build a resume.")
+        st.title("What's next?")
 
-        st.header("Final touches", divider="grey")
+        st.markdown(
+            """
+            1. Download the [chrome extension]()
+            2. Before you apply for a job, highlight the job posting and use the extension to receive your optimized resume!
+            3. If you need to update your information, come back here! Or else, happy applying!
+            """
+        )
 
-        st.subheader("Choose an accent color for your resume")
+        col1, _, _ = st.columns([1, 1, 8])
 
-        color = st.color_picker("", "#007BA7")
+        with col1:
+            if st.button("Back", use_container_width=True):
+                st.session_state.page = 2
+                st.rerun()
 
-        st.session_state.update({"color": color})
-
-        st.subheader("Choose a default template for your resume. This will be used in application portals where we don't have an optimized template.")
-
-        # select theme
+        
 
 if __name__ == "__main__":
 

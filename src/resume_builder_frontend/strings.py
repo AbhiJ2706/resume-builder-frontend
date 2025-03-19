@@ -34,7 +34,8 @@ def internal_to_external(key, fmt=None):
         "end": "End Date",
         "core_skills": f"{fmt} used",
         "extra_skills": f"{fmt} used",
-        "description": "Resume Points"
+        "description": "Resume Points",
+        "link": "Link (Optional)"
     }
 
     return field_names.get(key)
