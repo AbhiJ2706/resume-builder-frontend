@@ -1,0 +1,4 @@
+*/__pycache__
+.env
+credentials.json
+credentials_source_of_truth.json

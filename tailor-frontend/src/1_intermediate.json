@@ -1,0 +1,345 @@
+{
+    "user_resume_information": {
+      "firstname": "Phineas",
+      "lastname": "Flynn",
+      "phone": "+1 234 567 8901",
+      "email": "phineas@disney.com",
+      "linkedin": "https://linkedin.com/in/phineas-flynn-104",
+      "profile": "https://phineasflynn104.github.io",
+      "domains": [
+        "Advanced Robotics",
+        "Large-Scale Engineering",
+        "Time Travel Research",
+        "Covert Technology",
+        "Event Production",
+        "Community Engagement"
+      ],
+      "is_swe": false,
+      "color": "#007BA7",
+      "default_template": "",
+      "core_skill_label": "Skills",
+      "extra_skill_label": ""
+    },
+    "education": [
+      {
+        "institution": "Danville Institute of Science & Innovation",
+        "institution_location": "Danville, Tri-state Area",
+        "degree_name": "Bachelor of Science in Advanced Engineering & Applied Physics",
+        "start": "2007-09-01T04:00:00.000Z",
+        "end": "2011-06-07T04:00:00.000Z",
+        "relevant_coursework": "AI-driven robotics, sustainable energy solutions, and interdimensional physics.",
+        "completed": false
+      }
+    ],
+    "sections": {
+      "experience": {
+        "name": "experience",
+        "items": [],
+        "include": true
+      },
+      "projects": {
+        "name": "projects",
+        "items": [],
+        "include": false
+      }
+    },
+    "experience": [
+      {
+        "organization": "Flynn-Fletcher Backyard Enterprises",
+        "location": "Danville, Tri-state Area",
+        "position": "Co-Founder & Lead Engineer",
+        "start": "2007-06-08T06:48:49.377Z",
+        "end": "2025-03-19T06:48:49.377Z",
+        "core_skills": [
+          "Robotics",
+          "AI",
+          "Leadership",
+          "Problem-solving"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed and built over 100 large-scale inventions, including time machines, teleporters, and AI-driven robots.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Managed interdisciplinary teams, ensuring all projects met safety, quality, and fun standards.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Optimized energy efficiency for advanced machinery using self-sustaining power sources.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Developed and implemented security measures to protect inventions from external threats.Skills: Robotics, AI, Leadershi",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": true,
+        "link": ""
+      },
+      {
+        "organization": "Summer Rock Festival & One-Hit Wonder Records ",
+        "location": "Danville, Tri-state Area",
+        "position": "Co-Host & Engineer",
+        "start": "2011-07-04T06:51:06.598Z",
+        "end": "2011-07-04T06:51:06.598Z",
+        "core_skills": [
+          "Event Planning",
+          "Audio Engineering",
+          "Team Leadership",
+          "Music Production"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed a high-tech stage and audio-visual system for an impromptu rock concert.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Engineered sound equipment that amplified performances to stadium levels.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Wrote and recorded the hit single “Gitchee Gitchee Goo,” which topped local charts.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Organized festival logistics, including band coordination and security.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      },
+      {
+        "organization": "O.W.C.A. (Unofficial)",
+        "location": "Danville, Tri-state Area",
+        "position": "Amateur Secret Agent & Gadget Specialist",
+        "start": "2010-06-08T06:54:18.781Z",
+        "end": "2010-09-01T06:54:18.781Z",
+        "core_skills": [
+          "Engineering",
+          "Espionage Technology",
+          "AI",
+          "Stealth Tactics"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed high-tech spy gadgets to assist Perry the Platypus in top-secret missions.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Developed a laser-powered grappling hook for high-speed travel.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Created an AI-driven disguise system for covert operations.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Conducted field tests on new espionage technology under real-world conditions.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      },
+      {
+        "organization": "Danville Theme Park (Unofficial)",
+        "location": "Danville, Tri-state Area",
+        "position": "Junior Rollercoaster Engineer",
+        "start": "2009-06-08T06:56:51.213Z",
+        "end": "2009-03-19T06:56:51.213Z",
+        "core_skills": [
+          "Civil Engineering",
+          "Structural Analysis",
+          "Safety Engineering",
+          "Rapid Prototyping"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed and built a full-scale rollercoaster in a single day.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Integrated safety measures ensuring zero injuries, despite high-speed loops and drops.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Conducted live testing with friends and neighborhood residents.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Adapted rollercoaster track to withstand unexpected aerial transportation.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      },
+      {
+        "organization": "Self-Initiated Temporal Research",
+        "location": "Various",
+        "position": "Time Traveler & Multidimensional Explorer",
+        "start": "2008-06-08T06:59:27.897Z",
+        "end": "2008-09-01T06:59:27.897Z",
+        "core_skills": [
+          "Temporal Physics",
+          "Multiverse Theory",
+          "Ethical Engineering",
+          "Crisis Management"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed and built a fully functional time machine using scavenged parts.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Conducted research across various historical periods without altering the timeline.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Explored alternate dimensions, including a world ruled by an alternate version of himself.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Developed contingency protocols to ensure safe return to the present.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      },
+      {
+        "organization": "Summer Fun Fair",
+        "location": "Danville, Tri-state Area",
+        "position": "Amusement Park Architect",
+        "start": "2008-06-08T07:01:00.678Z",
+        "end": "2008-09-01T07:01:00.678Z",
+        "core_skills": [
+          "Architecture",
+          "Engineering",
+          "AI Systems",
+          "Public Engagement"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Designed and constructed an entire amusement park in a single day.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Engineered rides and attractions with advanced safety features.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Integrated AI-based crowd management for smooth park operation.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Provided free access to the entire community, enhancing summer enjoyment.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      }
+    ],
+    "extracurriculars": [],
+    "projects": [
+      {
+        "organization": "Independent",
+        "location": "Danville, Tri-state Area",
+        "position": "The Portal to Mars Initiative",
+        "start": "2009-06-08T07:02:41.209Z",
+        "end": "2009-06-08T07:02:41.209Z",
+        "core_skills": [
+          "Space Engineering",
+          "Physics",
+          "Telecommunications"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Developed a fully functional interplanetary transportation system.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Designed a breathable atmosphere solution for extended stays.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Enabled real-time video communication between Earth and Mars.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      },
+      {
+        "organization": "Independent",
+        "location": "Danville, Tri-state Area",
+        "position": "Giant Robot Battle",
+        "start": "2008-07-04T07:02:41.561Z",
+        "end": "2008-07-04T07:02:41.561Z",
+        "core_skills": [
+          "Robotics",
+          "AI",
+          "Combat Simulation",
+          "Ethical Engineering"
+        ],
+        "extra_skills": [],
+        "description": [
+          {
+            "summary": "Led the design of a large-scale robotic combatant for friendly neighborhood battles.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Implemented AI-driven combat strategies and advanced mobility systems.",
+            "required_skills": [],
+            "group": 0
+          },
+          {
+            "summary": "Ensured non-lethal safety mechanisms to promote fun and responsible robotics.",
+            "required_skills": [],
+            "group": 0
+          }
+        ],
+        "still_working": false,
+        "link": ""
+      }
+    ],
+    "research": []
+  }
