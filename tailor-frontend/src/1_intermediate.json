@@ -16,7 +16,7 @@
       ],
       "is_swe": false,
       "color": "#007BA7",
-      "default_template": "",
+      "default_template": "figtree",
       "core_skill_label": "Skills",
       "extra_skill_label": ""
     },
